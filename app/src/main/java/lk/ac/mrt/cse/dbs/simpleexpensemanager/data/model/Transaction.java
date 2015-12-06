@@ -16,6 +16,10 @@
 
 package lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model;
 
+import android.util.Log;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -60,11 +64,26 @@ public class Transaction {
     private ExpenseType expenseType;
     private double amount;
 
-    public Transaction(Date date, String accountNo,
-                       ExpenseType expenseType, double amount) {
+    public Transaction(Date date, String accountNo, ExpenseType expenseType, double amount) {
         this.date = date;
         this.accountNo = accountNo;
         this.expenseType = expenseType;
         this.amount = amount;
+    }
+
+    public Transaction(String date, String account_no, String expense_type, String amount) {
+
+        //Call when read from the data
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+
+        try {
+            this.date = df.parse(date);
+        } catch (ParseException e) {
+            Log.d("DATE ERROR", "INVALID CONVERSION @ Transaction Constructor 3");
+        }
+
+        this.accountNo = account_no;
+        this.expenseType = ExpenseType.valueOf(expense_type);
+        this.amount = Double.parseDouble(amount);
     }
 }

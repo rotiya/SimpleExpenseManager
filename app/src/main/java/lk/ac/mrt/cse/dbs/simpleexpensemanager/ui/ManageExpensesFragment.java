@@ -30,29 +30,35 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.ContextObject;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.R;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl.MyAccountDAO;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
 
-import static lk.ac.mrt.cse.dbs.simpleexpensemanager.Constants.EXPENSE_MANAGER;
 /**
  *
  */
 public class ManageExpensesFragment extends Fragment implements View.OnClickListener {
     private Button submitButton;
+    private Button btnCheckBalance;
     private EditText amount;
     private Spinner accountSelector;
     private RadioGroup expenseTypeGroup;
     private DatePicker datePicker;
     private ExpenseManager currentExpenseManager;
 
+    private static ManageExpensesFragment manageExpensesFragment = null;
+
     public static ManageExpensesFragment newInstance(ExpenseManager expenseManager) {
-        ManageExpensesFragment manageExpensesFragment = new ManageExpensesFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(EXPENSE_MANAGER, expenseManager);
-        manageExpensesFragment.setArguments(args);
+        if( manageExpensesFragment == null){
+            manageExpensesFragment = new ManageExpensesFragment();
+            manageExpensesFragment.currentExpenseManager = expenseManager;
+        }
         return manageExpensesFragment;
     }
 
@@ -64,10 +70,10 @@ public class ManageExpensesFragment extends Fragment implements View.OnClickList
         View rootView = inflater.inflate(R.layout.fragment_manage_expenses, container, false);
         submitButton = (Button) rootView.findViewById(R.id.submit_amount);
         submitButton.setOnClickListener(this);
+        btnCheckBalance = (Button) rootView.findViewById(R.id.check_balance);
 
         amount = (EditText) rootView.findViewById(R.id.amount);
         accountSelector = (Spinner) rootView.findViewById(R.id.account_selector);
-        currentExpenseManager = (ExpenseManager) getArguments().get(EXPENSE_MANAGER);
         ArrayAdapter<String> adapter =
                 null;
         if (currentExpenseManager != null) {
@@ -80,6 +86,26 @@ public class ManageExpensesFragment extends Fragment implements View.OnClickList
         RadioButton expenseType = (RadioButton) rootView.findViewById(R.id.expense);
         RadioButton incomeType = (RadioButton) rootView.findViewById(R.id.income);
         datePicker = (DatePicker) rootView.findViewById(R.id.date_selector);
+
+        btnCheckBalance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MyAccountDAO myAccountDAO = new MyAccountDAO();
+                try {
+                    Account account = myAccountDAO.getAccount((String) accountSelector.getSelectedItem());
+                    if(account != null){
+                        String line1 = "Account Holder : " + account.getAccountHolderName();
+                        String line2 = "Bank Name      : " + account.getBankName();
+                        String line3 = "Balance        : " +account.getBalance();
+                        Toast.makeText(ContextObject.getContext(), line1 + "\n" + line2 + "\n" + line3, Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(ContextObject.getContext(), "No available accounts", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (InvalidAccountException e) {
+
+                }
+            }
+        });
         return rootView;
     }
 

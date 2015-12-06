@@ -33,18 +33,18 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.R;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
 
-import static lk.ac.mrt.cse.dbs.simpleexpensemanager.Constants.EXPENSE_MANAGER;
 /**
  *
  */
 public class ExpenseLogsFragment extends Fragment {
     private ExpenseManager currentExpenseManager;
 
+    private  static ExpenseLogsFragment expenseLogsFragment = null;
     public static ExpenseLogsFragment newInstance(ExpenseManager expenseManager) {
-        ExpenseLogsFragment expenseLogsFragment = new ExpenseLogsFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(EXPENSE_MANAGER, expenseManager);
-        expenseLogsFragment.setArguments(args);
+        if (expenseLogsFragment == null){
+            expenseLogsFragment = new ExpenseLogsFragment();
+            expenseLogsFragment.currentExpenseManager = expenseManager;
+        }
         return expenseLogsFragment;
     }
 
@@ -57,7 +57,6 @@ public class ExpenseLogsFragment extends Fragment {
         TableLayout logsTableLayout = (TableLayout) rootView.findViewById(R.id.logs_table);
         TableRow tableRowHeader = (TableRow) rootView.findViewById(R.id.logs_table_header);
 
-        currentExpenseManager = (ExpenseManager) getArguments().get(EXPENSE_MANAGER);
         List<Transaction> transactionList = new ArrayList<>();
         if (currentExpenseManager != null) {
             transactionList = currentExpenseManager.getTransactionLogs();

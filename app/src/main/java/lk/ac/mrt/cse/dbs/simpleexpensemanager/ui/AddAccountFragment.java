@@ -27,7 +27,6 @@ import android.widget.EditText;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.R;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
 
-import static lk.ac.mrt.cse.dbs.simpleexpensemanager.Constants.EXPENSE_MANAGER;
 /**
  *
  */
@@ -39,11 +38,14 @@ public class AddAccountFragment extends Fragment implements View.OnClickListener
     private EditText initialBalance;
     private Button addAccount;
 
+    public static AddAccountFragment addAccountFragment = null;
+
     public static AddAccountFragment newInstance(ExpenseManager expenseManager) {
-        AddAccountFragment addAccountFragment = new AddAccountFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(EXPENSE_MANAGER, expenseManager);
-        addAccountFragment.setArguments(args);
+        if (addAccountFragment == null){
+            addAccountFragment = new AddAccountFragment();
+            addAccountFragment.currentExpenseManager = expenseManager;
+        }
+
         return addAccountFragment;
     }
 
@@ -60,7 +62,6 @@ public class AddAccountFragment extends Fragment implements View.OnClickListener
         addAccount = (Button) rootView.findViewById(R.id.add_account);
         addAccount.setOnClickListener(this);
 
-        currentExpenseManager = (ExpenseManager) getArguments().get(EXPENSE_MANAGER);
         return rootView;
     }
 
@@ -72,7 +73,6 @@ public class AddAccountFragment extends Fragment implements View.OnClickListener
                 String bankNameStr = bankName.getText().toString();
                 String accountHolderStr = accountHolderName.getText().toString();
                 String initialBalanceStr = initialBalance.getText().toString();
-
 
                 if (accountNumStr.isEmpty()) {
                     accountNumber.setError(getActivity().getString(R.string.err_acct_number_empty));
